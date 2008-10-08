@@ -13,7 +13,8 @@ YAML::load_file('user.yml').each do |player|
     a.get("http://#{user}.labrute.fr/arene") do |page|
       if page.search("//div[@class='cellule']").nil?
         # pas dans la page cellule donc bien sur arene
-        login = page.search("//div[@class='name']")[0].inner_text
+        brute_a_combattre = rand(9)
+        login = page.search("//div[@class='name']")[brute_a_combattre].inner_text
       else
         login = nil
       end
@@ -27,4 +28,33 @@ YAML::load_file('user.yml').each do |player|
       break
     end
   end
+
+  puts 'HISTORIQUE'
+
+  #Recuperation des derniers évenements
+  a.get("http://#{user}.labrute.fr/cellule") do |page|
+    page.search("//div[@class='logs']")[0].each_child do |child|
+      if child.is_a? Hpricot::Elem
+        line = ''
+        case child.get_attribute('class')
+        when 'log log-win'
+          line = 'GAGNE : '
+        when 'log log-lose'
+          line = 'PERDU : '
+        when 'log log-childup'
+          line = 'ELEVE MONTE '
+        else
+          puts "class inconnu : #{child.get_attribute('class')}"
+        end
+
+        line += child.search("//div[@class='lmain']").inner_text.gsub("\n", "")
+        line += '('
+        line += child.search("//div[@class='ldetails']").inner_text.gsub("\n", "")
+        line += ')'
+        puts line
+      end
+    end
+  end
+  puts ''
+
 end
