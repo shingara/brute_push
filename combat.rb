@@ -1,3 +1,6 @@
+#! /usr/bin/env ruby
+
+require 'rubygems'
 require 'mechanize'
 
 # Mettre 2 arguments si on veux ce rand. Utile pour mettre dans un cron
