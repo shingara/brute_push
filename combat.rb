@@ -1,5 +1,9 @@
 require 'mechanize'
 
+# Mettre 2 arguments si on veux ce rand. Utile pour mettre dans un cron
+# et avoir un démarrage un peu aléatoire dans l'heure 
+sleep(rand(3600)) if ARGV[1]
+
 YAML::load_file('user.yml').each do |player|
   user = player['name']
   pass = player['pwd']
@@ -11,9 +15,9 @@ YAML::load_file('user.yml').each do |player|
   while true do
     login = nil
     a.get("http://#{user}.labrute.fr/arene") do |page|
-      if page.search("//div[@class='cellule']").nil?
+      if page.search("//div[@class='cellule']").empty?
         # pas dans la page cellule donc bien sur arene
-        brute_a_combattre = rand(9)
+        brute_a_combattre = rand(6)
         login = page.search("//div[@class='name']")[brute_a_combattre].inner_text
       else
         login = nil
@@ -23,6 +27,9 @@ YAML::load_file('user.yml').each do |player|
     unless login.nil?
       a.get("http://#{user}.labrute.fr/vs/#{login}")
       puts "combat avec #{login}"
+      # sleep car sinon plein de combat et pas forcement tous fait.
+      # Ajout d'un random pour se faire un peu moins détecter.
+      sleep(rand(10) + 2)   
     else
       puts 'plus de combat à réaliser'
       break
