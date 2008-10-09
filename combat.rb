@@ -36,6 +36,15 @@ YAML::load_file('user.yml').each do |player|
     end
   end
 
+  # Inscription tournois
+  a.get("http://#{user}.labrute.fr/sub") do |page|
+    page.search("//div[@id='tournament']")[0].each_child do |child|
+      if child.is_a? Hpricot::Elem
+        puts child.inner_text
+      end
+    end
+  end
+
   puts 'HISTORIQUE'
 
   #Recuperation des derniers évenements
